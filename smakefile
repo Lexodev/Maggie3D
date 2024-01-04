@@ -1,0 +1,34 @@
+#----------------------------------------------------------
+# Maggie 3D library release makefile
+# Fabrice Labrador <fabrice.labrador@gmail.com>
+# V1.0 December 2023
+#----------------------------------------------------------
+
+M3DLIB=lib
+M3DINC=src
+M3DDTA=tests
+M3DREL=release
+
+prepare: cleanfiles copyfiles
+  @list $(M3DREL)
+  @echo "**** Maggie3D libray release ready ****"
+
+package:
+  -@delete maggie3d.lha
+  @lha a -r maggie3d.lha $(M3DREL)/\#?
+  @echo "**** Maggie3D libray package ready ****"
+
+cleanfiles:
+  -@delete $(M3DREL)/Maggie3D.h
+  -@delete $(M3DREL)/maggie3d.lib
+  -@delete $(M3DREL)/Maggie3D_lib.txt
+  -@delete $(M3DREL)/texture.dds
+  -@delete $(M3DREL)/texture.bmp
+
+copyfiles:
+  @copy $(M3DLIB)/maggie3d.lib $(M3DREL)/maggie3d.lib
+  @copy $(M3DLIB)/Maggie3D_lib.txt $(M3DREL)/Maggie3D_lib.txt
+  @copy $(M3DINC)/Maggie3D.h $(M3DREL)/Maggie3D.h
+  @copy $(M3DDTA)/texture.dds $(M3DREL)/texture.dds
+  @copy $(M3DDTA)/texture.bmp $(M3DREL)/texture.bmp
+
