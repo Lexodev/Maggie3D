@@ -1,0 +1,95 @@
+#----------------------------------------------------------
+# Maggie3D shared library makefile
+# Fabrice Labrador <fabrice.labrador@gmail.com>
+# V1.1 May 2024
+#----------------------------------------------------------
+
+# Debug with : sashimi CONSOLE BUFK=64 NOPROMPT ASKEXIT ASKSAVE
+
+LIBNAME=            Maggie3D
+VERSION=            1
+REVISION=           6
+
+LIBFILE=            $(LIBNAME).library
+
+FD_CONV=            SC:C/FD2PRAGMA
+FD_FILE=            $(LIBNAME)_lib.fd
+PRAGMA_FILE=        $(LIBNAME)_pragmas.h
+PROTOS_FILE=        $(LIBNAME)_protos.h
+PROTO_FILE=         $(LIBNAME)_proto.h
+
+C_COMPILER=         SC:C/SC
+C_OPTS=             CPU=68040 IDIR=libinclude: MATH=68882 NOICONS NOSTKCHK LIBCODE
+A_COMPILER=         C:VASM
+
+LINKER=             SC:C/SLINK
+
+C_SOURCES=          Maggie3D_lib.c maggie.c memory.c zbuffer.c texture.c loader.c convert.c draw.c flattmap.c gouraudtmap.c flatshade.c gouraudshade.c
+A_SOURCES=          fast.asm
+
+OBJECTS=            Maggie3D_lib.o maggie.o memory.o zbuffer.o texture.o loader.o convert.o draw.o flattmap.o gouraudtmap.o flatshade.o gouraudshade.o fast.o
+LIBS=               LIB:scm881.lib LIB:sc.lib LIB:amiga.lib LIB:debug.lib
+
+LIBENT=             LIB:libent.o
+LIBINIT=            LIB:libinitr.o
+LIBPREFIX=          _LIB
+
+##############################################################################
+# Build the library
+
+$(LIBFILE): $(OBJECTS) $(LIBS) $(PRAGMA_FILE)
+
+    $(LINKER) WITH <<
+TO $(LIBFILE)
+FROM $(LIBENT) $(LIBINIT) $(OBJECTS)
+LIBFD $(FD_FILE)
+LIBPREFIX $(LIBPREFIX)
+LIBVERSION $(VERSION)
+LIBREVISION $(REVISION)
+LIB $(LIBS)
+NOICONS
+<
+  @version $(LIBFILE)
+
+$(PRAGMA_FILE): $(FD_FILE)
+
+##############################################################################
+# Default rules
+#
+.c.o:
+  $(C_COMPILER) $(C_OPTS) $*.c
+
+.asm.o:
+  $(A_COMPILER) -m68040 -Fhunk -o $*.o $*.asm
+
+.fd.h:
+  $(FD_CONV) $(FD_FILE) $(PRAGMA_FILE)
+
+##############################################################################
+# Clean the project files
+#
+clean:
+  -@Delete $(OBJECTS)
+  -@Delete $(LIBFILE)
+  -@Delete $(PRAGMA_FILE)
+
+##############################################################################
+# Install the new library into the system
+#
+install:
+  -@makedir libinclude:$(LIBNAME)
+  @copy $(LIBNAME).h libinclude:$(LIBNAME)/$(LIBNAME).h
+  @copy $(PROTOS_FILE) libinclude:clib/$(PROTOS_FILE)
+  @copy $(PRAGMA_FILE) libinclude:pragmas/$(PRAGMA_FILE)
+  @copy $(PROTO_FILE) libinclude:proto/$(LIBNAME).h
+  @copy $(LIBFILE) LIBS:$(LIBFILE)
+  @flushlibs
+  @version LIBS:$(LIBFILE)
+
+##############################################################################
+# Build the test program
+#
+test: maggie3d_test.c
+  $(C_COMPILER) LINK CPU=68040 IDIR=libinclude: MATH=68882 NOICONS maggie3d_test.c
+  -@Delete maggie3d_test.o
+  -@Delete maggie3d_test.lnk

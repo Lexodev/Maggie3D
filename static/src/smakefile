@@ -1,0 +1,65 @@
+#----------------------------------------------------------
+# Maggie 3D static library makefile
+# Fabrice Labrador <fabrice.labrador@gmail.com>
+# V1.0 November 2023
+#----------------------------------------------------------
+
+# Build options debug mode
+OPT=CPU=68040 MATH=68882 DATA=far NOICONS
+
+# Files
+M3DLIB=/lib/maggie3d.lib
+OBJ=maggie.o memory.o texture.o zbuffer.o draw.o flattmap.o gouraudtmap.o flatshade.o gouraudshade.o fast.o convert.o loader.o
+
+# Build Maggie3D library
+build: cleanlib $(OBJ)
+  oml $(M3DLIB) Add $(OBJ)
+  @list $(M3DLIB)
+  @echo "**** Maggie3D libray build complete ****"
+
+maggie.o: maggie.c maggie.h
+  sc maggie.c $(OPT)
+
+memory.o: memory.c memory.h
+  sc memory.c $(OPT)
+
+texture.o: texture.c texture.h
+  sc texture.c $(OPT)
+
+loader.o: loader.c texture.h
+  sc loader.c $(OPT)
+
+zbuffer.o: zbuffer.c zbuffer.h
+  sc zbuffer.c $(OPT)
+
+draw.o: draw.c draw.h
+  sc draw.c $(OPT)
+
+flatshade.o: flatshade.c draw.h
+  sc flatshade.c $(OPT)
+
+gouraudshade.o: gouraudshade.c draw.h
+  sc gouraudshade.c $(OPT)
+
+flattmap.o: flattmap.c draw.h
+  sc flattmap.c $(OPT)
+
+gouraudtmap.o: gouraudtmap.c draw.h
+  sc gouraudtmap.c $(OPT)
+
+convert.o: convert.c
+  sc convert.c $(OPT)
+
+fast.o: fast.asm draw.h
+  vasm -m68040 -Fhunk -o fast.o fast.asm
+
+# Clean files
+clean: cleanobj cleanlib
+  @echo "** Clean complete **"
+
+cleanlib:
+  -@delete $(M3DLIB)
+
+cleanobj:
+  -@delete \#?.o
+  -@delete \#?.lnk

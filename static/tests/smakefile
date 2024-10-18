@@ -1,0 +1,44 @@
+#----------------------------------------------------------
+# Maggie 3D static library makefile
+# Fabrice Labrador <fabrice.labrador@gmail.com>
+# V1.1 May 2024
+#----------------------------------------------------------
+
+# Build options debug mode
+OPT=CPU=68040 MATH=68882 DATA=far NOICONS
+LIB=/lib/maggie3d.lib
+
+# Files
+EXE=simple move
+
+# Build all demos
+all: $(EXE) clean
+
+simple: simple.c $(LIB)
+  sc LINK simple.c $(OPT) $(LIB)
+
+move: move.c $(LIB)
+  sc LINK move.c $(OPT) $(LIB)
+
+texture: texture.c $(LIB)
+  sc LINK texture.c $(OPT) $(LIB)
+
+sprite: sprite.c $(LIB)
+  sc LINK sprite.c $(OPT) $(LIB)
+
+cube: cube.c $(LIB)
+  sc LINK cube.c $(OPT) $(LIB)
+
+quad: quad.c $(LIB)
+  sc LINK quad.c $(OPT) $(LIB)
+
+# Clean files
+cleanall: clean cleanexe
+
+cleanexe :
+  -@delete $(EXE)
+
+clean:
+  -@delete \#?.o
+  -@delete \#?.lnk
+  @echo "** Clean complete **"

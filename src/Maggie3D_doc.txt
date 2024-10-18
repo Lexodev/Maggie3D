@@ -1,0 +1,198 @@
+**
+** Maggie3D shared library documentation V1.6
+**
+
+** Installation
+Copy the file Maggie3D.library in your LIBS: folder
+Copy the files from include directory to your include: assigned directory, if you want to compile the test
+
+** Distribution
+Files in maggie3d_library.lha
+/Maggie3D.libray                      The library (as expected :))
+/Maggie3D_doc.txt                     This documentation
+/include/Maggie3D_lib.fd              The library functions definition if you want to generate pragmas
+/include/Maggie3D.h                   The library .h file
+/include/clib/Maggie3D_protos.h       The library functions prototypes
+/include/pragmas/Maggie3D_pragmas.h   The library functions pragmas (for SAS/C)
+/demo/maggie3d_test                   A really simple test of Maggie3D triangle & sprite rendering
+/demo/maggie3d_test.c                 Source code of this simple test
+/demo/cube                            Demo of a mapped cube with support of transparency and mixed DXT1/BMP textures
+/demo/sprite                          Demo of sprite rendering
+/demo/bench                           A simple bench test
+
+** Notes
+The texture perspective correction is not yet implemented in this version
+
+** Library functions
+
+** Check if Maggie is present
+* @return TRUE if Maggie chip is available
+BOOL M3D_CheckMaggie(VOID);
+
+** Create a new context
+* @param error  A pointer to a LONG for storing the error code
+* @param bitmap A pointer to the screen Bitmap
+* @return Maggie3D context or NULL on error
+M3D_Context *M3D_CreateContext(LONG *error, struct BitMap *bitmap);
+
+** Destroy context and free all resources
+* @param context Maggie3D context
+VOID M3D_DestroyContext(M3D_Context *context);
+
+** Set the drawing region
+* @param context Maggie3D context
+* @param bitmap  A pointer to a bitmap where Maggie will render the triangle
+* @param scissor A pointer to a scissor for the clipping
+* @return Error code
+LONG M3D_SetDrawRegion(M3D_Context *context, struct BitMap *bitmap, M3D_Scissor *scissor);
+
+** Set the clipping scissor
+* @param context Maggie3D context
+* @param scissor A pointer to a scissor for the clipping
+* @return Error code
+VOID M3D_SetScissor(M3D_Context *context, M3D_Scissor *scissor);
+
+** Set the rendering state
+* @param context Maggie3D context
+* @param state   Render state
+* @param status  Render state status (M3D_ENABLE or M3D_DISABLE)
+* @return Error code
+LONG M3D_SetState(M3D_Context *context, UWORD state, BOOL status);
+
+** Get the rendering state
+* @param context Maggie3D context
+* @param state   Render state
+* @return Rendering state status (M3D_ENABLE or M3D_DISABLE)
+BOOL M3D_GetState(M3D_Context *context, UWORD state);
+
+Render state can be following :
+ M3D_FAST                 drawing functions may modify passed structures
+ M3D_TEXMAPPING           texture mapping state (enable by default)
+ M3D_GOURAUD              gouraud shading state (enable by default)
+ M3D_ZBUFFER              Z-Buffer state
+ M3D_ZBUFFERUPDATE        Z-Buffer update state (enable by default)
+ M3D_TEXCRDNORM           use normalized coordinates for texture
+ M3D_BLENDING             color blending state
+ M3D_PERSPECTIVE          perspective correction state (not yet available)
+
+** Find the best screen mode ID
+* @param width  Screen width
+* @param height Screen height
+* @param depth  Screen depth
+* @return Screen mode ID
+ULONG M3D_BestModeID(ULONG width, ULONG height, ULONG depth);
+
+** Lock the hardware before drawing
+* @param context Maggie3D context
+* @return Error code
+LONG M3D_LockHardware(M3D_Context *context);
+
+** Unlock the hardware
+* @param context Maggie3D context
+VOID M3D_UnlockHardware(M3D_Context *context);
+
+** Allocate the Z buffer
+* @param context Maggie3D context
+* @return Error code
+LONG M3D_AllocZBuffer(M3D_Context *context);
+
+** Free the Z buffer resources
+* @param context Maggie3D context
+VOID M3D_FreeZBuffer(M3D_Context *context);
+
+** Clear the Z buffer
+* @param context Maggie3D context
+* @return Error code
+LONG M3D_ClearZBuffer(M3D_Context *context);
+
+** Allocate a texture with tags
+* @param context Maggie3D context
+* @param error   A pointer to a LONG for storing the error code
+* @param tags    An array of tags
+* @return Maggie3D texture object or NULL on error
+M3D_Texture *M3D_AllocTextureTagList(M3D_Context *context, LONG *error, struct TagItem *tags);
+
+Tags can be following:
+ M3D_TT_DATA              texture data to allocate
+ M3D_TT_FORMAT            pixel format of the texture
+ M3D_TT_WIDTH             texture width
+ M3D_TT_HEIGHT            texture height
+ M3D_TT_PALETTE           texture palette if pixel format is CLUT
+ M3D_TT_TRANSPARENCY      texture has transparency (boolean)
+ M3D_TT_TRSCOLOR          texture transparent color (RGB value)
+ M3D_TT_AUTORESIZE        texture auto resize (boolean)
+ M3D_TT_FILENAME          texture file name to load and allocate
+
+** Allocate a texture
+* @param context Maggie3D context
+* @param error   A pointer to a LONG for storing the error code
+* @param data    Pointer to the texture data
+* @param pixfmt  Texture pixel format
+* @param width   Texture width
+* @param height  Texture height
+* @param palette A pointer to a palette for CLUT data or NULL in other case
+* @return Maggie3D texture object or NULL on error
+M3D_Texture *M3D_AllocTexture(M3D_Context *context, LONG *error, APTR data, UWORD pixfmt, ULONG width, ULONG height, ULONG *palette);
+
+** Allocate a texture from a file (support DDS and BMP file format)
+* @param context  Maggie3D context
+* @param error    A pointer to a LONG for storing the error code
+* @param filename Name of the texture file
+* @return Maggie3D texture object or NULL on error
+M3D_Texture *M3D_AllocTextureFile(M3D_Context *context, LONG *error, STRPTR filename);
+
+** Set the texture filtering
+* @param context   Maggie3D context
+* @param texture   Maggie3D texture
+* @param filtering Filtering mode (M3D_NEAREST or M3D_LINEAR)
+* @return Error code
+LONG M3D_SetFilter(M3D_Context *context, M3D_Texture *texture, UWORD filtering);
+
+** Release a texture
+* @param context Maggie3D context
+* @param texture Maggie3D texture
+VOID M3D_FreeTexture(M3D_Context *context, M3D_Texture *texture);
+
+** Release all textures
+* @param context Maggie3D context
+VOID M3D_FreeAllTextures(M3D_Context *context);
+
+** Clear the draw region with supplied color
+* @param context Maggie3D context
+* @param color   24bits color
+* @return Error code
+LONG M3D_ClearDrawRegion(M3D_Context *context, ULONG color);
+
+** Draw a single triangle
+* @param context  Maggie3D context
+* @param triangle Maggie3D triangle
+* @return Error code
+LONG M3D_DrawTriangle(M3D_Context *context, M3D_Triangle *triangle);
+
+** Draw an array of triangles
+* @param context   Maggie3D context
+* @param triangles An array of Maggie3D triangles
+* @patam count     Number of triangles to draw
+* @return Error code
+LONG M3D_DrawTriangleArray(M3D_Context *context, M3D_Triangle *triangles, ULONG count);
+
+** Draw a list of triangles
+* @param context   Maggie3D context
+* @param triangles A list of Maggie3D triangles
+* @patam count     Number of triangles to draw
+* @return Error code
+LONG M3D_DrawTriangleList(M3D_Context *context, M3D_Triangle **triangles, ULONG count);
+
+** Draw a single quad
+* @param context Maggie3D context
+* @param quad    Maggie3D quad
+* @return Error code
+LONG M3D_DrawQuad(M3D_Context *context, M3D_Quad *quad);
+
+** Draw a sprite at given position
+* @param context   Maggie3D context
+* @param sprite    Maggie3D sprite
+* @patam xpos      X position of the sprite
+* @patam ypos      Y position of the sprite
+* @return Error code
+LONG M3D_DrawSprite(M3D_Context *context, M3D_Sprite *sprite, LONG xpos, LONG ypos);

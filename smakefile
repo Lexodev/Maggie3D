@@ -1,0 +1,59 @@
+#----------------------------------------------------------
+# Maggie 3D shared library release makefile
+# Fabrice Labrador <fabrice.labrador@gmail.com>
+# V1.6 June 2024
+#----------------------------------------------------------
+
+LIBRARY=            src
+TESTS=              tests
+RELEASE=            release
+INCLUDE=            release/include
+DEMO=               release/demo
+VERSION=            1_6
+
+archive: copyfiles package
+  @list $(RELEASE)
+  @echo "**** Maggie3D shared libray release ready ****"
+
+package:
+  -@delete maggie3d_library\#?.lha
+  @lha a -r maggie3d_library_$(VERSION).lha $(RELEASE)/\#?
+  @echo "**** Maggie3D libray package ready ****"
+
+copyfiles:
+  @copy $(LIBRARY)/Maggie3D.library $(RELEASE)/
+  @copy $(LIBRARY)/Maggie3D_doc.txt $(RELEASE)/
+  @copy $(LIBRARY)/Maggie3D_lib.fd $(INCLUDE)/
+  @copy $(LIBRARY)/Maggie3D.h $(INCLUDE)/Maggie3D/
+  @copy $(LIBRARY)/Maggie3D_protos.h $(INCLUDE)/clib/
+  @copy $(LIBRARY)/Maggie3D_pragmas.h $(INCLUDE)/pragmas/
+  @copy $(LIBRARY)/Maggie3D_proto.h $(INCLUDE)/proto/Maggie3D.h
+  @copy $(LIBRARY)/maggie3d_test $(DEMO)/
+  @copy $(LIBRARY)/maggie3d_test.c $(DEMO)/
+  @copy $(LIBRARY)/texture.dds $(DEMO)/
+  @copy $(LIBRARY)/texture.bmp $(DEMO)/
+  @copy $(LIBRARY)/warrior.bmp $(DEMO)/
+  @copy $(TESTS)/transparent.dds $(DEMO)/
+  @copy $(TESTS)/transparent.bmp $(DEMO)/
+  @copy $(TESTS)/cube $(DEMO)/
+  @copy $(TESTS)/bench $(DEMO)/
+  @copy $(TESTS)/sprite $(DEMO)/
+
+clearfiles:
+  -@delete $(INCLUDE)/\#?.h
+  -@delete $(INCLUDE)/Maggie3D/\#?.h
+  -@delete $(INCLUDE)/clib/\#?.h
+  -@delete $(INCLUDE)/pragmas/\#?.h
+  -@delete $(INCLUDE)/proto/\#?.h
+  -@delete $(DEMO)/\#?
+  -@delete $(RELEASE)/Maggie3D.library
+  -@delete $(RELEASE)/Maggie3D_doc.txt
+
+prepare:
+  @makedir $(RELEASE)
+  @makedir $(DEMO)
+  @makedir $(INCLUDE)
+  @makedir $(INCLUDE)/Maggie3D
+  @makedir $(INCLUDE)/clib
+  @makedir $(INCLUDE)/pragmas
+  @makedir $(INCLUDE)/proto

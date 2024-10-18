@@ -1,0 +1,41 @@
+#----------------------------------------------------------
+# Maggie 3D shared tests makefile
+# Fabrice Labrador <fabrice.labrador@gmail.com>
+# V1.1 April 2024
+#----------------------------------------------------------
+
+# Build options debug mode
+OPT=CPU=68040 MATH=68882 IDIR=libinclude: NOICONS
+
+# Files
+EXE=simple move cube bench sprite
+
+# Build Maggie3D library
+build: $(EXE) cleanobj
+  @echo "** Build complete **"
+
+simple: simple.c
+  sc LINK simple.c $(OPT)
+
+move: move.c
+  sc LINK move.c $(OPT)
+
+cube: cube.c
+  sc LINK cube.c $(OPT)
+
+sprite: sprite.c
+  sc LINK sprite.c $(OPT)
+
+bench: bench.c
+  sc LINK bench.c $(OPT)
+
+# Clean files
+clean: cleanobj cleanexe
+  @echo "** Clean complete **"
+
+cleanexe:
+  -@delete $(EXE)
+
+cleanobj:
+  -@delete \#?.o
+  -@delete \#?.lnk
